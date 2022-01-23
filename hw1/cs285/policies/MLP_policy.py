@@ -80,8 +80,8 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
         else:
             observation = obs[None]
 
-        # TODO return the action that the policy prescribes
-        raise NotImplementedError
+        # DONE return the action that the policy prescribes
+        return self(torch.Tensor(observation).to(self.device)).cpu().detach().numpy()
 
     # update/train this policy
     def update(self, observations, actions, **kwargs):
