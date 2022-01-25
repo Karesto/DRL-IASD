@@ -49,15 +49,13 @@ def build_mlp(
 
     # DONE: return a MLP. This should be an instance of nn.Module
     # Note: nn.Sequential is an instance of nn.Module.
-    layers = [('linear1', nn.Linear(input_size, size)), ('activation1', activation)]
+    layers = [nn.Linear(input_size, size), activation]
     for i in range(2, n_layers+1):
-        layers.append((f'linear{i}', nn.Linear(size, size)))
-        layers.append((f'activation{i}', activation))
+        layers.append(nn.Linear(size, size))
+        layers.append(activation)
 
-    layers.extend([(f'linear{n_layers+1}', nn.Linear(size, output_size)), (f'activation{n_layers+1}', output_activation)])
-
-    model = nn.Sequential(OrderedDict(layers))
-    print(model)
+    layers.extend([nn.Linear(size, output_size), output_activation])
+    model = nn.Sequential(*layers)
     return model
 
 
