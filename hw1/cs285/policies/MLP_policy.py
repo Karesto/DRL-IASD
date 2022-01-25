@@ -1,6 +1,6 @@
 import abc
 import itertools
-from typing import Any
+from typing import Any, cast
 from torch import nn
 from torch.nn import functional as F
 from torch import optim
@@ -37,7 +37,7 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
         self.learning_rate = learning_rate
         self.training = training
         self.nn_baseline = nn_baseline
-
+        print(ac_dim)
         self.mlp = ptu.build_mlp(
           ob_dim, ac_dim, n_layers, size
         )
@@ -86,8 +86,12 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
             observation = obs[None]
 
         # DONE return the action that the policy prescribes
-        return self(torch.Tensor(observation).to(ptu.device)).cpu().detach().numpy()
-
+        observation_tensor = torch.tensor(observation, dtype=torch.float).to(ptu.device)
+        action_distribution = self.forward(observation_tensor)
+        return cast(
+            np.ndarray,
+            action_distribution.sample().cpu().detach().numpy(),
+        )
     # update/train this policy
     def update(self, observations, actions, **kwargs):
         raise NotImplementedError
@@ -98,7 +102,14 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
     # return more flexible objects, such as a
     # `torch.distributions.Distribution` object. It's up to you!
     def forward(self, observation: torch.FloatTensor) -> Any:
-        return self.mlp(observation)
+        if self.discrete:
+            act_dist = torch.distributions.Categorical(logits=self.logits_na(observation))
+        else:
+            act_dist = distributions.MultivariateNormal(
+                loc=self.mean_net(observation),
+                covariance_matrix=torch.diag(torch.exp(self.logstd)),
+            )
+        return act_dist
 
 #####################################################
 #####################################################
@@ -106,7 +117,7 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
 class MLPPolicySL(MLPPolicy):
     def __init__(self, ac_dim, ob_dim, n_layers, size, **kwargs):
         super().__init__(ac_dim, ob_dim, n_layers, size, **kwargs)
-        self.loss = nn.MSELoss()
+        self.loss = nn.CrossEntropyLoss()
 
     def update(
             self, observations, actions,
@@ -114,11 +125,13 @@ class MLPPolicySL(MLPPolicy):
     ):
         # TODO: update the policy and return the loss
         self.optimizer.zero_grad()
-        predicted_actions = self(torch.Tensor(observations).to(ptu.device))
-        
-        loss = self.loss(predicted_actions, torch.Tensor(actions).to(ptu.device))
+        predicted_actions = self.forward(torch.Tensor(observations).to(ptu.device))
+        # Loss is proportional to the negative log-likelihood.
+        loss = -predicted_actions.log_prob(torch.Tensor(actions).to(ptu.device)).mean()
         loss.backward()
         self.optimizer.step()
+
+        
         return {
             # You can add extra logging information here, but keep this line
             'Training Loss': ptu.to_numpy(loss),
