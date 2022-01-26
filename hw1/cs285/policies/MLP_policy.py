@@ -24,6 +24,7 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
                  learning_rate=1e-4,
                  training=True,
                  nn_baseline=False,
+                 momentum=0.9,
                  **kwargs
                  ):
         super().__init__(**kwargs)
@@ -49,6 +50,7 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
                 output_size=self.ac_dim,
                 n_layers=self.n_layers,
                 size=self.size,
+                activation="sigmoid"
             )
             self.logits_na.to(ptu.device)
             self.mean_net = None
@@ -68,8 +70,8 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
             )
             self.logstd.to(ptu.device)
             self.optimizer = optim.Adam(
-                itertools.chain([self.logstd], self.mean_net.parameters()),
-                self.learning_rate
+                itertools.chain([self.logstd], self.mean_net.parameters(),),
+                self.learning_rate,
             )
 
     ##################################

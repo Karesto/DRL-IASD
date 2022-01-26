@@ -84,7 +84,7 @@ class RL_Trainer(object):
         :param start_relabel_with_expert: iteration at which to start relabel with expert
         :param expert_policy:
         """
-
+        self.loglist = []
         # init vars at beginning of training
         self.total_envsteps = 0
         self.start_time = time.time()
@@ -123,19 +123,19 @@ class RL_Trainer(object):
 
             # train agent (using sampled data from replay buffer)
             training_logs = self.train_agent()  # HW1: implement this function below
-
             # log/save
             if self.log_video or self.log_metrics:
 
                 # perform logging
                 print('\nBeginning logging procedure...')
-                self.perform_logging(
+                logiter = self.perform_logging(
                     itr, paths, eval_policy, train_video_paths, training_logs)
 
                 if self.params['save_params']:
                     print('\nSaving agent params')
                     self.agent.save('{}/policy_itr_{}.pt'.format(self.params['logdir'], itr))
-
+                self.loglist.append(logiter)
+        return self.loglist
     ####################################
     ####################################
 
@@ -274,3 +274,5 @@ class RL_Trainer(object):
             print('Done logging...\n\n')
 
             self.logger.flush()
+            return(logs.copy())
+
