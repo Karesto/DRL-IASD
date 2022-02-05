@@ -3,6 +3,7 @@ import numpy as np
 from .base_agent import BaseAgent
 from cs285.policies.MLP_policy import MLPPolicyPG
 from cs285.infrastructure.replay_buffer import ReplayBuffer
+from cs285.infrastructure import utils
 
 
 class PGAgent(BaseAgent):
@@ -47,7 +48,7 @@ class PGAgent(BaseAgent):
             # and obtain a train_log
         
         q_vals = self.calculate_q_vals(rewards_list)
-        advantages = self.estimate_advantage(observations, q_values)
+        advantages = self.estimate_advantage(observations, rewards_list, q_vals, terminals)
             
         train_log = self.actor.update(next_observations, actions, advantages, q_vals)
         return train_log
@@ -172,7 +173,7 @@ class PGAgent(BaseAgent):
         n = len(rewards)
         list_of_discounted_cumsums= (self.gamma**(np.tile(np.arange(n),(n,1)))*rewards).sum(axis=1)
 
-        return list_of_discounted_returns
+        return list_of_discounted_cumsums
 
     def _discounted_cumsum(self, rewards):
         """

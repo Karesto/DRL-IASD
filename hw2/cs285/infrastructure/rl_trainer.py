@@ -120,6 +120,8 @@ class RL_Trainer(object):
             else:
                 self.logvideo = False
 
+            self.log_video = self.logvideo
+            
             # decide if metrics should be logged
             if self.params['scalar_log_freq'] == -1:
                 self.logmetrics = False
@@ -171,7 +173,7 @@ class RL_Trainer(object):
             train_video_paths: paths which also contain videos for visualization purposes
         """
         #DONE
-        if itr == 0:
+        if itr == 0 and load_initial_expertdata:
             with open(load_initial_expertdata, "rb") as f:
                 loaded_paths = pickle.load(f)
             return loaded_paths, 0, None
