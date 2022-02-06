@@ -69,7 +69,7 @@ def main():
     parser.add_argument('--train_batch_size', '-tb', type=int, default=1000) ##steps used per gradient step
 
     parser.add_argument('--num_agent_train_steps_per_iter', type=int, default=1)
-    parser.add_argument('--discount', type=float, default=1.0)
+    parser.add_argument('--discount', type=float, default=0.99)
     parser.add_argument('--learning_rate', '-lr', type=float, default=5e-3)
     parser.add_argument('--n_layers', '-l', type=int, default=2)
     parser.add_argument('--size', '-s', type=int, default=64)

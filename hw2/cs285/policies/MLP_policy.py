@@ -10,6 +10,7 @@ import torch
 from torch import distributions
 
 from cs285.infrastructure import pytorch_util as ptu
+from cs285.infrastructure import utils
 from cs285.policies.base_policy import BasePolicy
 
 
@@ -150,13 +151,18 @@ class MLPPolicyPG(MLPPolicy):
             # 'zero_grad' first
             
         actions_distribution = self.forward(observations)
-        loss = -(actions_distribution.log_prob(actions) * advantages).sum()
+        log_probs = actions_distribution.log_prob(actions)
+        if not self.discrete:
+            log_probs = log_probs.sum(1)
+        assert log_probs.size() == advantages.size()
+        loss = -(log_probs * advantages).sum()
+
 
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
         
-        if self.nn_baseline:
+        if self.nn_baseline and q_values is not None:
             ## DONE: update the neural network baseline using the q_values as
             ## targets. The q_values should first be normalized to have a mean
             ## of zero and a standard deviation of one.
