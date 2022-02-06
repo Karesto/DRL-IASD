@@ -176,7 +176,7 @@ class RL_Trainer(object):
                 loaded_paths = pickle.load(f)
             return loaded_paths, 0, None
         print("\nCollecting data to be used for training...")
-        path s, envsteps_this_batch = utils.sample_trajectories(self.env, collect_policy, batch_size, self.params['ep_len'])
+        paths, envsteps_this_batch = utils.sample_trajectories(self.env, collect_policy, batch_size, self.params['ep_len'])
 
 
         # collect more rollouts with the same policy, to be saved as videos in tensorboard
