@@ -116,11 +116,9 @@ class RL_Trainer(object):
 
             # decide if videos should be rendered/logged at this iteration
             if itr % self.params['video_log_freq'] == 0 and self.params['video_log_freq'] != -1:
-                self.logvideo = True
+                self.log_video = True
             else:
-                self.logvideo = False
-
-            self.log_video = self.logvideo
+                self.log_video = False
             
             # decide if metrics should be logged
             if self.params['scalar_log_freq'] == -1:
@@ -144,7 +142,7 @@ class RL_Trainer(object):
             train_logs = self.train_agent()
 
             # log/save
-            if self.logvideo or self.logmetrics:
+            if self.log_video or self.logmetrics:
                 # perform logging
                 print('\nBeginning logging procedure...')
                 self.perform_logging(itr, paths, eval_policy, train_video_paths, train_logs)
@@ -178,7 +176,7 @@ class RL_Trainer(object):
                 loaded_paths = pickle.load(f)
             return loaded_paths, 0, None
         print("\nCollecting data to be used for training...")
-        paths, envsteps_this_batch = utils.sample_trajectories(self.env, collect_policy, batch_size, self.params['ep_len'])
+        path s, envsteps_this_batch = utils.sample_trajectories(self.env, collect_policy, batch_size, self.params['ep_len'])
 
 
         # collect more rollouts with the same policy, to be saved as videos in tensorboard
@@ -222,7 +220,7 @@ class RL_Trainer(object):
         eval_paths, eval_envsteps_this_batch = utils.sample_trajectories(self.env, eval_policy, self.params['eval_batch_size'], self.params['ep_len'])
 
         # save eval rollouts as videos in tensorboard event file
-        if self.logvideo and train_video_paths != None:
+        if self.log_video and train_video_paths != None:
             print('\nCollecting video rollouts eval')
             eval_video_paths = utils.sample_n_trajectories(self.env, eval_policy, MAX_NVIDEO, MAX_VIDEO_LEN, True)
 
