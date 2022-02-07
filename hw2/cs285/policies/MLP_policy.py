@@ -152,8 +152,8 @@ class MLPPolicyPG(MLPPolicy):
             
         actions_distribution = self.forward(observations)
         log_probs = actions_distribution.log_prob(actions)
-        if not self.discrete:
-            log_probs = log_probs.sum(1)
+        #if not self.discrete:
+            #log_probs = log_probs.sum(1)
         assert log_probs.size() == advantages.size()
         loss = -(log_probs * advantages).sum()
 
