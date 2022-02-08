@@ -152,8 +152,8 @@ class MLPPolicyPG(MLPPolicy):
             
         actions_distribution = self.forward(observations)
         log_probs = actions_distribution.log_prob(actions)
-        if not self.discrete:
-            log_probs = log_probs.sum(1)
+        #if not self.discrete:
+            #log_probs = log_probs.sum(1)
         assert log_probs.size() == advantages.size()
         loss = -(log_probs * advantages).sum()
 
@@ -173,9 +173,8 @@ class MLPPolicyPG(MLPPolicy):
                 ## ptu.from_numpy before using it in the loss
                 
             q_values = ptu.from_numpy(q_values)
-            norm_q_values = utils.normalize(q_values, np.mean(q_values), np.std(q_values))
-            
-            baseline_loss = self.baseline_loss(self.baseline(observations),norm_q_values)
+            norm_q_values = utils.normalize(q_values, q_values.mean(), q_values.std())
+            baseline_loss = self.baseline_loss(self.baseline(observations).squeeze(),norm_q_values)
             
             self.baseline_optimizer.zero_grad()
             baseline_loss.backward()
