@@ -28,6 +28,7 @@ class PG_Trainer(object):
 
         train_args = {
             'num_agent_train_steps_per_iter': params['num_agent_train_steps_per_iter'],
+            'train_per_sample': params['train_per_sample']
         }
 
         agent_params = {**computation_graph_args, **estimate_advantage_args, **train_args}
@@ -36,7 +37,7 @@ class PG_Trainer(object):
         self.params['agent_class'] = PGAgent
         self.params['agent_params'] = agent_params
         self.params['batch_size_initial'] = self.params['batch_size']
-
+        
         ################
         ## RL TRAINER
         ################
@@ -83,6 +84,7 @@ def main():
 
     parser.add_argument('--save_params', action='store_true')
     parser.add_argument('--action_noise_std', type=float, default=0)
+    parser.add_argument('--train_per_sample', type=int, default=1)
 
     args = parser.parse_args()
 

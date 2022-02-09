@@ -205,8 +205,9 @@ class RL_Trainer(object):
             # DONE ? use the sampled data to train an agent
             # HINT: use the agent's train function
             # HINT: keep the agent's training log for debugging
-            train_log = self.agent.train(ob_batch, ac_batch, re_batch, next_ob_batch, terminal_batch)
-            all_logs.append(train_log)
+            for i in range(self.params['train_per_sample']):
+                train_log = self.agent.train(ob_batch, ac_batch, re_batch, next_ob_batch, terminal_batch)
+                all_logs.append(train_log)
         return all_logs
 
     def perform_logging(self, itr, paths, eval_policy, train_video_paths, all_logs):
