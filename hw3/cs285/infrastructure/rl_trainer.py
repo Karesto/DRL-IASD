@@ -142,9 +142,9 @@ class RL_Trainer(object):
 
             # decide if videos should be rendered/logged at this iteration
             if itr % self.params['video_log_freq'] == 0 and self.params['video_log_freq'] != -1:
-                self.logvideo = True
+                self.log_video = True
             else:
-                self.logvideo = False
+                self.log_video = False
 
             # decide if metrics should be logged
             if self.params['scalar_log_freq'] == -1:
@@ -185,7 +185,7 @@ class RL_Trainer(object):
             all_logs = self.train_agent()
 
             # log/save
-            if self.logvideo or self.logmetrics:
+            if self.log_video or self.logmetrics:
                 # perform logging
                 print('\nBeginning logging procedure...')
                 if isinstance(self.agent, DQNAgent):
@@ -232,9 +232,8 @@ class RL_Trainer(object):
         all_logs = []
         for train_step in range(self.params['num_agent_train_steps_per_iter']):
             ob_batch, ac_batch, re_batch, next_ob_batch, terminal_batch = self.agent.sample(self.params['train_batch_size'])
-            for i in range(self.params['train_per_sample']):
-                train_log = self.agent.train(ob_batch, ac_batch, re_batch, next_ob_batch, terminal_batch)
-                all_logs.append(train_log)
+            train_log = self.agent.train(ob_batch, ac_batch, re_batch, next_ob_batch, terminal_batch)
+            all_logs.append(train_log)
         return all_logs
 
     ####################################
@@ -286,7 +285,7 @@ class RL_Trainer(object):
         eval_paths, eval_envsteps_this_batch = utils.sample_trajectories(self.env, eval_policy, self.params['eval_batch_size'], self.params['ep_len'])
 
         # save eval rollouts as videos in tensorboard event file
-        if self.logvideo and train_video_paths != None:
+        if self.log_video and train_video_paths != None:
             print('\nCollecting video rollouts eval')
             eval_video_paths = utils.sample_n_trajectories(self.env, eval_policy, MAX_NVIDEO, MAX_VIDEO_LEN, True)
 
