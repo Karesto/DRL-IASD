@@ -61,7 +61,7 @@ class DQNAgent(object):
                 # and then use those observations as input to your actor.
             recent_frames = self.replay_buffer.encode_recent_observation()
             action = self.actor.get_action(recent_frames)
-        
+
         # Done take a step in the environment using the action from the policy
         # HINT1: remember that self.last_obs must always point to the newest/latest observation
         # HINT2: remember the following useful function that you've seen before:

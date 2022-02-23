@@ -19,7 +19,7 @@ class Q_Trainer(object):
         }
 
         env_args = get_env_kwargs(params['env_name'])
-
+        print(env_args)
         self.agent_params = {**train_args, **env_args, **params}
 
         self.params['agent_class'] = DQNAgent
@@ -85,7 +85,6 @@ def main():
         os.makedirs(logdir)
 
     print("\n\n\nLOGGING TO: ", logdir, "\n\n\n")
-
     trainer = Q_Trainer(params)
     trainer.run_training_loop()
 
