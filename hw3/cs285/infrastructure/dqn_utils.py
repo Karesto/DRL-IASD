@@ -60,7 +60,7 @@ def get_env_kwargs(env_name):
         kwargs = {
             'optimizer_spec': lander_optimizer(),
             'q_func': create_lander_q_network,
-            'replay_buffer_size': 50000,
+            'replay_buffer_size': 300000,
             'batch_size': 32,
             'gamma': 1,
             'learning_starts': 1000,
@@ -162,7 +162,7 @@ def lander_optimizer():
     return OptimizerSpec(
         constructor=optim.Adam,
         optim_kwargs=dict(
-            lr=1,
+            lr=1e-3,
         ),
         learning_rate_schedule=lambda epoch: 1e-3,  # keep init learning rate
     )
